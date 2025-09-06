@@ -1,0 +1,17 @@
+ 
+# Use the official GCC compiler image as a base
+FROM gcc:latest
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy all project files to the working directory
+COPY . .
+
+# Compile the client application using the Makefile
+RUN make chat_client
+
+# The client is an interactive application, so we don't set a default CMD.
+# Instead, we provide an entrypoint that allows for interactive sessions.
+# This command just keeps the container running, waiting for user input.
+ENTRYPOINT [ "/bin/bash" ]

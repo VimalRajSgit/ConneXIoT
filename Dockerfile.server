@@ -1,0 +1,32 @@
+ 
+# --- Build Stage ---
+# Use the official GCC compiler image as a base
+FROM gcc:latest AS builder
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy all your project files from your local machine to the container's /app directory
+COPY . .
+
+# Run the 'make' command to compile your client and server executables
+# This will create 'chat_server' and 'chat_client' binaries
+RUN make chat_server
+
+# --- Final Stage ---
+# Use a lightweight base image for a smaller final container size
+FROM debian:bullseye-slim
+
+WORKDIR /app
+
+# Copy only the compiled server binary from the builder stage
+COPY --from=builder /app/chat_server .
+
+# Expose port 8000 to the outside world.
+# This port needs to be mapped when you run the container.
+# You will also need to open this port in your cloud provider's (e.g., Azure) firewall settings.
+EXPOSE 8000
+
+# Command to run when the container starts.
+# This will execute './chat_server 8000'
+CMD ["./chat_server", "8000"]
